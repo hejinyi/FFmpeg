@@ -1,0 +1,7 @@
+1、视频截取
+
+将V60425-154307.mp4中8s到12s的数据保存为test.mp4
+ffmpeg -i /tmp/V60425-154307.mp4 -c copy -ss 8 -to 12 /tmp/test.mp4
+
+2、修改视频分辨率
+

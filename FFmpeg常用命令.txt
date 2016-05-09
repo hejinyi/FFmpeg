@@ -1,0 +1,8 @@
+1、视频截取
+
+将V60425-154307.mp4中8s到12s的数据保存为test.mp4
+ffmpeg -i /tmp/V60425-154307.mp4 -c copy -ss 8 -to 12 /tmp/test.mp4
+
+2、修改视频分辨率
+用-s参数设置视频分辨率，参数值wxh，w宽度单位是像素，h高度单位是像素
+ffmpeg -i input_file -s 320x240 output_file
