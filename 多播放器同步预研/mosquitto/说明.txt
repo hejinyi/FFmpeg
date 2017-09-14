@@ -1,0 +1,13 @@
+server/MsAndroidMosquitto.apk
+该apk是MQTT协议中的server端。在android电视上安装后启动即可。第一次需在串口下手动启动，以后都是开机自动启动。
+安装命令：pm install apk路径
+启动命令：am startservice -a com.hisense.msandroidmosquitto.MosquittoBrokerService
+
+client/libmosquitto.a
+client/mosquitto.h
+MQTT协议中客户端的库文件和头文件，库文件是使用的32位的NDK工具链编译的，需要64位的话可以再提供。
+
+client/mysql_log.c
+客户端头文件的调用示例。
+
+注意：MsAndroidMosquitto.apk的监听端口改为了36669，因此在客户端中调用mosquitto_connect_async或者mosquitto_connect接口时端口参数是36669。
