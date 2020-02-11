@@ -43,6 +43,13 @@ TAGS=tags
 CURRENTDIR=$(pwd)
 FILESEPARATOR=____hejinyi____
 
+#hejinyiDir include dirs where to find files
+DIRNAME=hejinyiDir
+#hejinyiExclude include dirs that should not to find files
+EXCLUDEDIRNAME=hejinyiExclude
+
+declare DIRS
+
 if [ "$1" == "lookupfile" -o $# -eq 0 -o "$1" == "clean" ]; then
     tput setf 4
     if [ -f $LOOKUPFILENAME ]; then
@@ -52,9 +59,32 @@ if [ "$1" == "lookupfile" -o $# -eq 0 -o "$1" == "clean" ]; then
     if [ "$1" != "clean" ]; then
         tput setf 2
         echo -e "!_TAG_FILE_SORTED\t2\t/2=foldcase/" > $LOOKUPFILENAME
-        #find $(pwd) -regex '.*\.\(c\|C\|c++\|C++\|cpp\|CPP\|java\|jar\|mk\)$' -type f -printf "%f\t%p\t1\n" | sort -f >> $LOOKUPFILENAME
-        find $(pwd) -regex '.*\(\.h\|\.c\|\.C\|\.cxx\|\.cp\|\.cc\|\.cpp\|\.c++\|\.C++\|\.hpp\|\.java\|\.xml\|\.mk\|\.kl\|\.mak\|makefile\|Makefile\)$' -type f -printf "%f${FILESEPARATOR}%p${FILESEPARATOR}1\n" | sort -f >> $LOOKUPFILENAME
-        #find $(pwd) -name "*.h" -o -name "*.c" -o -name "*.cc" -o -name "*.java" -o -name "*.cpp" -o -name "*.xml" -o -name "*.kl" -o -name "*.mk" -o -name "*.mak" -o -name "makefile" -o -name "Makefile" -printf "%f\t%p\t1\n" | sort -f >> $LOOKUPFILENAME
+        declare LOOPER
+        if [ -f ${DIRNAME} ]; then
+            DIRS=$(cat ${DIRNAME})
+            echo "include dir:${DIRS}"
+            for LOOPER in $DIRS
+            do
+                find ${LOOPER} -regex '.*\(\.h\|\.c\|\.C\|\.cxx\|\.cp\|\.cc\|\.cpp\|\.c++\|\.C++\|\.hpp\|\.java\|\.xml\|\.mk\|\.kl\|\.mak\|makefile\|Makefile\)$' -type f -printf "%f${FILESEPARATOR}%p${FILESEPARATOR}1\n" | sort -f >> $LOOKUPFILENAME
+            done
+        else
+            #find $(pwd) -regex '.*\.\(c\|C\|c++\|C++\|cpp\|CPP\|java\|jar\|mk\)$' -type f -printf "%f\t%p\t1\n" | sort -f >> $LOOKUPFILENAME
+            find $(pwd) -regex '.*\(\.h\|\.c\|\.C\|\.cxx\|\.cp\|\.cc\|\.cpp\|\.c++\|\.C++\|\.hpp\|\.java\|\.xml\|\.mk\|\.kl\|\.mak\|makefile\|Makefile\)$' -type f -printf "%f${FILESEPARATOR}%p${FILESEPARATOR}1\n" | sort -f >> $LOOKUPFILENAME
+            #find $(pwd) -name "*.h" -o -name "*.c" -o -name "*.cc" -o -name "*.java" -o -name "*.cpp" -o -name "*.xml" -o -name "*.kl" -o -name "*.mk" -o -name "*.mak" -o -name "makefile" -o -name "Makefile" -printf "%f\t%p\t1\n" | sort -f >> $LOOKUPFILENAME
+        fi
+        declare EXCLUDES
+        if [ -f ${EXCLUDEDIRNAME} ]; then
+            if [ ! -z $(grep '\\/' ${EXCLUDEDIRNAME}) ]; then
+                EXCLUDES=$(cat ${EXCLUDEDIRNAME})
+            else
+                EXCLUDES=$(cat ${EXCLUDEDIRNAME} | sed '1,$s/\//\\\//g')
+            fi
+            echo "exclude dir:${EXCLUDES}"
+            for LOOPER in ${EXCLUDES}
+            do
+                sed -i "/^.*${LOOPER}.*$/d" $LOOKUPFILENAME
+            done
+        fi
         echo "Generated ${CURRENTDIR}/$LOOKUPFILENAME"
 
         tput setf 7
